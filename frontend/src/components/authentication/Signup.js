@@ -8,18 +8,93 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { useToast } from "@chakra-ui/react";
+import axios from "axios";
+import { useHistory } from "react-router";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const Toast = useToast();
+  const history = useHistory();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pic, setPic] = useState("");
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleClick = () => setShow(!show);
-  const postDetails = () => {};
-  const submitHandler = () => {};
+  const submitHandler = async () => {
+    setLoading(true);
+    if (!name || !email || !password || !confirmPassword) {
+      Toast({
+        title: "Please Fill all the Feilds",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      Toast({
+        title: "Passwords Do Not Match",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    if (pic) {
+      formData.append("pic", pic);
+    }
+
+    try {
+      const config = {
+        haeders: {
+          "Content-type": "multipart/form=data",
+        },
+      };
+      const { data } = await axios.post("/api/user/sign-up", formData, config);
+      Toast({
+        title: "Registration Successful",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      history.push("/chats");
+    } catch (error) {
+      Toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+    const postDetails = (file) => {
+      if (file) {
+        setPic(file);
+      } else {
+        Toast({
+          title: "Please select an image!",
+          status: "warning",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+  };
 
   return (
     <VStack spacing="5px" color="black">
@@ -55,7 +130,7 @@ const Signup = () => {
       </FormControl>
 
       <FormControl id="confirm-password" isRequired>
-              <FormLabel>Confirm Password</FormLabel>
+        <FormLabel>Confirm Password</FormLabel>
         <InputGroup size={"md"}>
           <Input
             type={show ? "text" : "password"}
@@ -70,7 +145,7 @@ const Signup = () => {
         </InputGroup>
       </FormControl>
 
-      <FormControl id="pic" >
+      <FormControl id="pic">
         <FormLabel>Upload Your Picture</FormLabel>
         <Input
           type="file"
@@ -85,6 +160,7 @@ const Signup = () => {
         width="100%"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
+        isLoading={loading}
       >
         Sign Up
       </Button>
