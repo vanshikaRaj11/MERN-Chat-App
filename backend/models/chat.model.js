@@ -21,10 +21,8 @@ const chatModel = mongoose.Schema(
       ref: "Message",
     },
     groupAdmin: {
-      type: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {
@@ -33,4 +31,4 @@ const chatModel = mongoose.Schema(
 );
 
 const Chat = mongoose.model("Chat", chatModel);
-module.exports = Chat
+module.exports = Chat;
