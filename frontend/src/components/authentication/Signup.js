@@ -9,14 +9,15 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useToast } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useHistory } from "react-router";
+
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const Toast = useToast();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pic, setPic] = useState("");
@@ -71,7 +72,7 @@ const Signup = () => {
       });
       localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
-      history.push("/chats");
+      navigate("/chats");
     } catch (error) {
       Toast({
         title: "Error Occured!",
