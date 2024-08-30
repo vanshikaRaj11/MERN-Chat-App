@@ -13,6 +13,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
+import { IoEyeOutline } from "react-icons/io5";
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -26,7 +27,7 @@ const ProfileModal = ({ user, children }) => {
       ) : (
         <IconButton
           display={{ base: "flex" }}
-          icon={<viewIcon />}
+          icon={<IoEyeOutline />}
           onClick={onOpen}
         ></IconButton>
       )}

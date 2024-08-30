@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   FormControl,
   Input,
@@ -16,6 +17,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { ChatState } from "../../context/ChatProvider";
 import UserListItem from "../userAvatar/UserListItem";
+import UserBadgeItem from "../userAvatar/UserBadgeItem";
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,7 +30,57 @@ const GroupChatModal = ({ children }) => {
   const toast = useToast();
 
   const { user, chats, setChats } = ChatState();
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => {
+    if (!groupChatName || !selectedUsers) {
+      toast({
+        title: "Please fill all the feilds",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/chat/group",
+        {
+          name: groupChatName,
+          users: JSON.stringify(selectedUsers.map((u) => u._id)),
+        },
+        config
+      );
+
+      setChats([data, ...chats]);
+      onClose();
+      toast({
+        title: "New Group Chat Created!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to Create the Chat!",
+        description: error.response.data,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+  const handleDelete = async (delUser) => {
+    setSelectedUsers(selectedUsers.filter((sel) => sel._id !== delUser._id));
+  };
   const handleSearch = async (query) => {
     setSearch(query);
     if (!query) {
@@ -43,8 +95,8 @@ const GroupChatModal = ({ children }) => {
       };
 
       const { data } = await axios.get(`/api/user?search=${search}`, config);
-      console.log("Data",data);
-      
+      console.log("Data", data);
+
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -57,11 +109,22 @@ const GroupChatModal = ({ children }) => {
         position: "bottom-left",
       });
     }
-    };
-    
-    const handleGroup=() => {
-        
+  };
+
+  const handleGroup = (userToAdd) => {
+    if (selectedUsers.includes(userToAdd)) {
+      toast({
+        title: "User already added",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
     }
+
+    setSelectedUsers([...selectedUsers, userToAdd]);
+  };
 
   return (
     <>
@@ -95,13 +158,29 @@ const GroupChatModal = ({ children }) => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>
+
+            <Box w="100%" display="flex" flexWrap="wrap">
+              {selectedUsers.map((u) => (
+                <UserBadgeItem
+                  key={user._id}
+                  user={u}
+                  handleFunction={() => handleDelete(u)}
+                />
+              ))}
+            </Box>
+
             {loading ? (
               <div>loading...</div>
             ) : (
               searchResult
                 ?.slice(0, 4)
-                  .map((user) => <UserListItem key={user._id} user={user} handleFunction={() => handleGroup(user)}>
-                </UserListItem>)
+                .map((user) => (
+                  <UserListItem
+                    key={user._id}
+                    user={user}
+                    handleFunction={() => handleGroup(user)}
+                  ></UserListItem>
+                ))
             )}
           </ModalBody>
 
