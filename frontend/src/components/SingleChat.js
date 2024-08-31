@@ -3,6 +3,8 @@ import { ChatState } from "../context/ChatProvider";
 import { Box, IconButton, Text } from "@chakra-ui/react";
 import { FaArrowLeft } from "react-icons/fa";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
+import {getSender,getFullSender} from "../config/ChatLogics"
+import ProfileModal from "./miscellaneous/ProfileModal";
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
@@ -26,16 +28,33 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               onClick={() => setSelectedChat("")}
             />
             {!selectedChat.isGroupChat ? (
-            <></>
+              <>
+                {getSender(user, selectedChat.user)}
+                <ProfileModal user={getFullSender(user, selectedChat.user)} />
+              </>
             ) : (
-                <>
-                  {selectedChat.chatName.toUppercase()}
-                  <UpdateGroupChatModal fetchAgain={fetchAgain} 
-                    setFetchAgain={setFetchAgain}
-                  />
-                </>
+              <>
+                {selectedChat.chatName.toUpperCase()}
+                <UpdateGroupChatModal
+                  fetchAgain={fetchAgain}
+                  setFetchAgain={setFetchAgain}
+                />
+              </>
             )}
           </Text>
+          <Box
+            display="flex"
+            flexDir="column"
+            justifyContent="flex-end"
+            p={3}
+            bg="#E8E8E8"
+            w="100%"
+            h="100%"
+            borderRadius="lg"
+            overflowY="hidden"
+          >
+            {/* {Messages here} */}
+          </Box>
         </>
       ) : (
         <Box

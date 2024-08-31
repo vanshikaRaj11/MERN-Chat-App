@@ -13,7 +13,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
-import { IoEyeOutline } from "react-icons/io5";
+import { IoEye} from "react-icons/io5";
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -21,15 +21,15 @@ const ProfileModal = ({ user, children }) => {
   console.log(user);
 
   return (
-    <div>
+    <>
       {children ? (
         <span onClick={onOpen}>{children}</span>
       ) : (
         <IconButton
           display={{ base: "flex" }}
-          icon={<IoEyeOutline />}
+          icon={<IoEye />}
           onClick={onOpen}
-        ></IconButton>
+        />
       )}
       <Modal size="lg" isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -70,7 +70,7 @@ const ProfileModal = ({ user, children }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 };
 
