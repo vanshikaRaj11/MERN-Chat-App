@@ -49,5 +49,5 @@ const ScrollableChat = ({ messages }) => {
     </ScrollableFeed>
   );
 };
-
+ 
 export default ScrollableChat;

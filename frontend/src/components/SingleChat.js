@@ -82,7 +82,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
-    socket.on("connection", () => setSocketConnected(true));
+    socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
   }, []);
@@ -172,7 +172,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             fontSize={{ base: "28px", md: "30px" }}
             pb={3}
             px={2}
-            w="!00%"
+            w="100%"
             fontFamily="Work sans"
             display="flex"
             justifyContent={{ base: "space-between" }}
@@ -183,21 +183,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               icon={<FaArrowLeft />}
               onClick={() => setSelectedChat("")}
             />
-            {!selectedChat.isGroupChat ? (
-              <>
-                {getSender(user, selectedChat.users)}
-                <ProfileModal user={getFullSender(user, selectedChat.users)} />
-              </>
-            ) : (
-              <>
-                {selectedChat.chatName.toUpperCase()}
-                <UpdateGroupChatModal
-                  fetchAgain={fetchAgain}
-                  setFetchAgain={setFetchAgain}
-                  fetchMessages={fetchMessages}
-                />
-              </>
-            )}
+            {messages &&
+              (!selectedChat.isGroupChat ? (
+                <>
+                  {getSender(user, selectedChat.users)}
+                  <ProfileModal
+                    user={getFullSender(user, selectedChat.users)}
+                  />
+                </>
+              ) : (
+                <>
+                  {selectedChat.chatName.toUpperCase()}
+                  <UpdateGroupChatModal
+                    fetchMessages={fetchMessages}
+                    fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain}
+                  />
+                </>
+              ))}
           </Text>
           <Box
             display="flex"
@@ -220,17 +223,20 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
             ) : (
               <div className="messages">
-                {" "}
                 <ScrollableChat messages={messages} />
               </div>
             )}
 
-            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+            <FormControl
+              onKeyDown={sendMessage}
+              id="first-name"
+              isRequired
+              mt={3}
+            >
               {istyping ? (
                 <div>
                   <Lottie
                     options={defaultOptions}
-                    // height={50}
                     width={70}
                     style={{ marginBottom: 15, marginLeft: 0 }}
                   />
